@@ -17,4 +17,5 @@ class Logout
         Session::invalidate();
         Session::regenerateToken();
     }
+    
 }
