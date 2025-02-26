@@ -14,7 +14,7 @@ class Departments extends Component
 {
     use WithPagination, AuthorizesRequests;
 
-    protected $paginationTheme = 'tailwind';
+    // protected $paginationTheme = 'tailwind';
     
     public $name;
     public $department_id;
