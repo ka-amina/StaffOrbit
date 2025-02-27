@@ -6,6 +6,8 @@ use App\Livewire\Contracts;
 use App\Livewire\Posts;
 use App\Livewire\Formations;
 use App\Livewire\Grades;
+use App\Livewire\Users;
+
 
 // use App\Models\Contract;
 
@@ -24,6 +26,7 @@ Route::get('/departments', Departments::class)->name('departments');
 Route::get('/posts', Posts::class)->name('posts');
 Route::get('/formations', Formations::class)->name('formations');
 Route::get('/grades', Grades::class)->name('grades');
+Route::get('/users', Users::class)->name('users');
 
 
 Route::get('/contracts', Contracts::class)->middleware(['auth'])->name('contracts.index');
