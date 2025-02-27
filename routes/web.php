@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Departments;
 use App\Livewire\Contracts;
 use App\Livewire\Posts;
+
 // use App\Models\Contract;
 
 Route::view('/', 'welcome');
@@ -17,6 +18,7 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 Route::get('/departments', Departments::class)->name('departments');
+
 Route::get('/posts', Posts::class)->name('posts');
 
 Route::get('/contracts', Contracts::class)->middleware(['auth'])->name('contracts.index');
