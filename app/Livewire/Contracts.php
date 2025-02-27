@@ -106,7 +106,7 @@ public function render()
     public function store()
 {
     $this->validate();
-    $contractType = ContractType::find($this->contract_type); 
+    $contractType = ContractType::find($this->contract_type);
     if (!$contractType) {
         session()->flash('error', 'Invalid contract type selected.');
         return;
@@ -126,7 +126,7 @@ public function render()
 
         DB::table('employee_contract')->insert([
             'employee_id' => $this->user_id,
-            'contract_id' => $contract->id, // Corrected
+            'contract_id' => $contract->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
