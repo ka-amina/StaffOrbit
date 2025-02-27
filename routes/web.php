@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Departments;
+use App\Livewire\Contracts;
+// use App\Models\Contract;
 
 Route::view('/', 'welcome');
 
@@ -14,6 +16,8 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 Route::get('/departments', Departments::class)->name('departments');
+
+Route::get('/contracts', Contracts::class)->middleware(['auth'])->name('contracts.index');
 // Route::get('/departments', function () {
 //     return view('departments');
 // })->name('departments');
