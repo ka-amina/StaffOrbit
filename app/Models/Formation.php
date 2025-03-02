@@ -18,6 +18,7 @@ class Formation extends Model
 //    }
     public function users()
     {
-        return $this->belongsToMany(users::class, 'employe_formation');
+        return $this->belongsToMany(User::class, 'employe_formation');
     }
+    
 }
