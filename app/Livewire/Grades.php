@@ -76,7 +76,6 @@ class Grades extends Component
 
     public function store()
     {
-        // Validate directly using the rules method
         $this->validate();
 
         Grade::updateOrCreate(['id' => $this->grade_id], [

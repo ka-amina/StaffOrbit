@@ -30,16 +30,9 @@ class Contracts extends Component
         'document_path' => 'nullable|string|max:255',
     ];
 
-    // public function render()
-    // {
-    //     // Fetch contracts with pagination
-    //     // $contracts = Contract::with('user')->paginate(10); // You can change 10 to your desired pagination count
-    //     $contracts = Contract::with('user')->paginate(10); // Livewire pagination
-    //     return view('livewire.contracts', ['contracts' => $contracts]);
-    // }
     public function mount()
 {
-    $this->contractTypes = ContractType::all(); // Fetch contract types
+    $this->contractTypes = ContractType::all();
 }
 
 

@@ -3,10 +3,12 @@
 namespace App\Livewire;
 
 use App\Models\Formation;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class Formations extends Component
 {
@@ -82,7 +84,6 @@ class Formations extends Component
 
     public function store()
     {
-        // Validate directly using the rules method
         $this->validate();
 
         Formation::updateOrCreate(['id' => $this->formation_id], [
