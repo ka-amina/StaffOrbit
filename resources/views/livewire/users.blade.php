@@ -239,7 +239,10 @@
                 </div>
                 @endforeach
             </div>
-
+            <a href="{{ route('demande', Auth::id()) }}" 
+        class="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm">
+        Demande
+    </a>
             <div class="mt-4">
                 {{ $users->links() }}
             </div>
