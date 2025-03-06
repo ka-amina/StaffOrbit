@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Grade;
 use App\Models\Department;
@@ -26,6 +27,8 @@ class Users extends Component
     public $departments;
     public $contractTypes;
     public $grades;
+    public $user;
+    
 
     protected function rules()
     {
@@ -51,6 +54,28 @@ class Users extends Component
         $this->departments = Department::all();
         $this->contractTypes = ContractType::all();
         $this->grades = Grade::all();
+        $this->user = User::all();
+        $this->calculateLeaveBalance();
+
+    }
+
+    public function calculateLeaveBalance()
+    {
+        foreach ($this->user as $u) {
+            $recruitmentDate = Carbon::parse($u->recruitment_date);
+            $now = Carbon::now();
+            $monthsWorked = $recruitmentDate->diffInMonths($now);
+
+            if ($monthsWorked >= 12) {
+                $yearsWorked = $recruitmentDate->diffInYears($now);
+                $leaveBalance = 18 + ($yearsWorked * 0.5);
+            } else {
+                $leaveBalance = $monthsWorked * 1.5;
+            }
+
+            $u->solde_conge = $leaveBalance;
+            $u->save();
+        }
     }
 
     public function render()
