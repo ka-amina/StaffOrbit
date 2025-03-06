@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\WithFileUploads; // Add this for file uploads
+use Livewire\WithFileUploads;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Grade;
 use App\Models\Department;
 use App\Models\ContractType;
 use Illuminate\Support\Facades\Storage;
@@ -14,16 +16,19 @@ use Illuminate\Validation\Rule;
 class Users extends Component
 {
     use WithPagination;
-    use WithFileUploads; // Add this trait
+    use WithFileUploads;
 
-    public $name, $email, $password, $avatar, $phone, $birth_date, $address, $recruitment_date, $contract_type, $departement_id, $salary, $status;
-    public $temp_avatar; // For temporary file upload
+    public $name, $email, $password, $avatar, $phone, $birth_date, $address, $recruitment_date, $contract_type, $departement_id, $salary, $status ,$grade_id;
+    public $temp_avatar;
     public $user_id;
     public $isOpen = false;
     public $isDeleteModalOpen = false;
     public $searchTerm = '';
     public $departments;
     public $contractTypes;
+    public $grades;
+    public $user;
+    
 
     protected function rules()
     {
@@ -31,7 +36,7 @@ class Users extends Component
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($this->user_id)],
             'password' => $this->user_id ? 'nullable|string|min:8' : 'required|string|min:8',
-            'temp_avatar' => 'nullable|image|max:1024', // 1MB Max
+            'temp_avatar' => 'nullable|image|max:1024',
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'required|date',
             'address' => 'nullable|string',
@@ -40,6 +45,7 @@ class Users extends Component
             'departement_id' => 'required|exists:departments,id',
             'salary' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive,terminated',
+            'grade_id' => 'required|exists:grades,id',
         ];
     }
 
@@ -47,6 +53,29 @@ class Users extends Component
     {
         $this->departments = Department::all();
         $this->contractTypes = ContractType::all();
+        $this->grades = Grade::all();
+        $this->user = User::all();
+        $this->calculateLeaveBalance();
+
+    }
+
+    public function calculateLeaveBalance()
+    {
+        foreach ($this->user as $u) {
+            $recruitmentDate = Carbon::parse($u->recruitment_date);
+            $now = Carbon::now();
+            $monthsWorked = $recruitmentDate->diffInMonths($now);
+
+            if ($monthsWorked >= 12) {
+                $yearsWorked = $recruitmentDate->diffInYears($now);
+                $leaveBalance = 18 + ($yearsWorked * 0.5);
+            } else {
+                $leaveBalance = $monthsWorked * 1.5;
+            }
+
+            $u->solde_conge = $leaveBalance;
+            $u->save();
+        }
     }
 
     public function render()
@@ -54,11 +83,12 @@ class Users extends Component
         $searchTerm = '%' . $this->searchTerm . '%';
 
         return view('livewire.users', [
+            'grades' => $this->grades,
             'users' => User::join('departments', 'users.departement_id', '=', 'departments.id')
-                ->select('users.*', 'departments.name as department_name') // Fetch department name
+                ->select('users.*', 'departments.name as department_name')
                 ->where('users.name', 'like', $searchTerm)
                 ->orWhere('users.email', 'like', $searchTerm)
-                ->orderBy('users.name')
+                ->orderBy('users.name')                                           
                 ->paginate(10),
             'count' => User::count(),
             'departments' => $this->departments,
@@ -83,12 +113,21 @@ class Users extends Component
         $this->isDeleteModalOpen = false;
     }
 
+    public function updateCareerRecord($user, $type, $notes)
+    {
+        $user->careerRecords()->create([
+            'type' => $type,
+            'notes' => $notes,
+            'status' => 'active',
+        ]);
+    }
+
     public function store()
     {
         $validatedData = $this->validate();
 
-        // Create data array with base fields
         $userData = [
+            'grade_id' => $this->grade_id,
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
@@ -101,14 +140,11 @@ class Users extends Component
             'status' => $this->status,
         ];
 
-        // Handle password conditionally
         if ($this->password) {
             $userData['password'] = bcrypt($this->password);
         }
 
-        // Handle avatar upload if present
         if ($this->temp_avatar) {
-            // Delete old image if it exists and we're updating
             if ($this->user_id) {
                 $user = User::find($this->user_id);
                 if ($user && $user->avatar) {
@@ -116,19 +152,27 @@ class Users extends Component
                 }
             }
 
-            // Store the new image
             $avatarPath = $this->temp_avatar->store('avatars', 'public');
             $userData['avatar'] = $avatarPath;
         }
 
-        // Update or create the user
         if ($this->user_id) {
-            // If updating, only update filled fields
             $user = User::find($this->user_id);
             $user->update($userData);
+
+            if ($user->wasChanged('salary')) {
+                $this->updateCareerRecord($user, 'salary_change', 'Salary updated to ' . $this->salary);
+            }
+            if ($user->wasChanged('grade_id')) {
+                $this->updateCareerRecord($user, 'promotion', 'Grade updated to ' . $this->grade_id);
+            }
         } else {
-            // If creating new user, include all fields
-            User::create($userData);
+            $user = User::create($userData);
+            $user->careerRecords()->create([
+                'type' => 'onboarding',
+                'notes' => 'User onboarded',
+                'status' => 'active',
+            ]);
         }
 
         session()->flash('message', 'User saved successfully!');
@@ -142,7 +186,7 @@ class Users extends Component
         $this->user_id = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->password = ''; // Don't fill password for security
+        $this->password = '';
         $this->avatar = $user->avatar;
         $this->phone = $user->phone;
         $this->birth_date = $user->birth_date;
@@ -151,6 +195,7 @@ class Users extends Component
         $this->contract_type = $user->contract_type;
         $this->departement_id = $user->departement_id;
         $this->salary = $user->salary;
+        $this->grade_id = $user->grade_id;
         $this->status = $user->status;
         $this->openModal();
     }
@@ -159,7 +204,6 @@ class Users extends Component
     {
         $user = User::findOrFail($userId);
 
-        // Delete user avatar if exists
         if ($user->avatar) {
             Storage::disk('public')->delete($user->avatar);
         }
@@ -195,6 +239,7 @@ class Users extends Component
         $this->contract_type = '';
         $this->departement_id = '';
         $this->salary = '';
+        $this->grade_id = '';
         $this->status = 'active';
         $this->resetValidation();
     }

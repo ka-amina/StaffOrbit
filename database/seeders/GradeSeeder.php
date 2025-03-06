@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Container\Attributes\DB;
+use App\Models\Grade;
+
 
 class GradeSeeder extends Seeder
 {
@@ -12,6 +15,14 @@ class GradeSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $grades = [
+            'Junior',
+            'Mid-level',
+            'Senior',
+            'Lead',
+        ];
+        foreach($grades as $grade){
+            Grade::create(['name'=>$grade]);
+        }
     }
 }

@@ -89,7 +89,6 @@ class Departments extends Component
 
     public function store()
     {
-        // Validate directly using the rules method
         $this->validate();
 
         Department::updateOrCreate(['id' => $this->department_id], [

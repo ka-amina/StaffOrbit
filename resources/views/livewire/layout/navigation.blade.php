@@ -66,6 +66,14 @@ new class extends Component
                         {{ __('Users') }}
                     </x-nav-link>
                 </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('conge')" :active="request()->routeIs('conge')" wire:navigate>
+                        {{ __('list de conge') }}
+                    </x-nav-link>
+                </div>
+
+
             </div>
 
             <!-- Settings Dropdown -->

@@ -7,7 +7,9 @@ use App\Livewire\Posts;
 use App\Livewire\Formations;
 use App\Livewire\Grades;
 use App\Livewire\Users;
-
+use App\Livewire\Career;
+use App\Livewire\Conge\CongeForm;
+use App\Livewire\Conge\CongeList;
 
 // use App\Models\Contract;
 
@@ -27,7 +29,9 @@ Route::get('/posts', Posts::class)->name('posts');
 Route::get('/formations', Formations::class)->name('formations');
 Route::get('/grades', Grades::class)->name('grades');
 Route::get('/users', Users::class)->name('users');
-
+Route::get('/users/{userId}', Career::class)->name('career');
+Route::get('/demande/{userId}', CongeForm::class)->name('demande');
+Route::get('/listConge', CongeList::class)->name('conge');
 
 Route::get('/contracts', Contracts::class)->middleware(['auth'])->name('contracts.index');
 // Route::get('/departments', function () {
