@@ -52,7 +52,7 @@ class CongeForm extends Component
         
         $user = Auth::user();
         
-        if ($this->type === 'Congé annuel' && $user->solde_conge < $this->total_days) {
+        if ($this->type === 'Congé annuel' && $user->solde_conge - $user->leave_days < $this->total_days) {
             session()->flash('error', 'Solde de congé insuffisant. Vous avez ' . $user->solde_conge . ' jours disponibles.');
             return;
         }

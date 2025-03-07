@@ -56,7 +56,8 @@ class AllCongeList extends Component
             } elseif ($hrApproved === 1 && $managerApproved === 1) {
                 $conge->update(['status' => 'approved']);
                 $user = User::findOrFail($conge->user_id);
-                $user->solde_conge = $user->solde_conge - $conge->total_days;
+                $user->leave_days=$user->leave_days + $conge->total_days;
+                // $user->solde_conge = $user->solde_conge - $conge->total_days;
                 $user->save();
             }
         }
