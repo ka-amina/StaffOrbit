@@ -20,7 +20,6 @@ class CongeList extends Component
     public function mount()
     {
         $this->year = now()->year;
-        $this->check();
     }
 
     public function updatedStatus()
@@ -33,86 +32,6 @@ class CongeList extends Component
         $this->resetPage();
     }
 
-    public function check()
-    {
-        $conges = Conge::where('status', 'pending')->get();
-
-        foreach ($conges as $conge) {
-            $hrApproved = $conge->hr_approval ?? null;
-            $managerApproved = $conge->manager_approval?? null;
-
-            if ($hrApproved === 0 || $managerApproved === 0) {
-                $conge->update(['status' => 'rejected']);
-            } elseif ($hrApproved === 1 && $managerApproved === 1) {
-
-                $conge->update(['status' => 'approved']);
-                $user=User::findOrFail($conge->user_id);
-                $user->solde_conge = $user->solde_conge - $conge->total_days;
-                $user->save();
-                
-            }
-        }
-    }
-
-    public function cancelRequestRh($congeId)
-    {
-        $conge = Conge::findOrFail($congeId);
-
-        if ($conge->status === 'pending') {
-            $conge->hr_approval = false;
-
-            $conge->save();
-            $this->check();
-
-            session()->flash('success', 'Demande de congé rejetée par RH.');
-        } else {
-            session()->flash('error', 'Impossible de rejeter cette demande de congé.');
-        }
-    }
-
-    public function cancelRequestManager($congeId)
-    {
-        $conge = Conge::findOrFail($congeId);
-
-        if ($conge->status === 'pending') {
-
-            $conge->manager_approval = false;
-
-            $conge->save();
-            $this->check();
-
-            session()->flash('success', 'Demande de congé rejetée par le manager.');
-        } else {
-            session()->flash('error', 'Impossible de rejeter cette demande de congé.');
-        }
-    }
-
-
-    public function approveRequestRh($congeId)
-{
-    $conge = Conge::findOrFail($congeId);
-    if ($conge->status === 'pending') {
-        $conge->hr_approval = true;
-        $conge->save();
-        $this->check(); 
-        session()->flash('success', 'Demande de congé approuvée par RH.');
-    } else {
-        session()->flash('error', 'Impossible d\'approuver cette demande de congé.');
-    }
-}
-
-public function approveRequestManager($congeId)
-{
-    $conge = Conge::findOrFail($congeId);
-    if ($conge->status === 'pending') {
-        $conge->manager_approval = true;
-        $conge->save();
-        $this->check();
-        session()->flash('success', 'Demande de congé approuvée par le manager.');
-    } else {
-        session()->flash('error', 'Impossible d\'approuver cette demande de congé.');
-    }
-}
 
     public function render()
     {

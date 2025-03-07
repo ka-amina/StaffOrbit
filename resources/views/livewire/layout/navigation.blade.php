@@ -34,44 +34,69 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                @can('manage departments')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('departments')" :active="request()->routeIs('departments')" wire:navigate>
                         {{ __('Departments') }}
                     </x-nav-link>
                 </div>
+                @endcan
+
+                @can('manage-contracts')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('contracts.index')" :active="request()->routeIs('index.contracts')" wire:navigate>
                         {{ __('Contracts') }}
                     </x-nav-link>
                 </div>
+                @endcan
+
+                @can('manage-jobs')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('posts')" :active="request()->routeIs('posts')" wire:navigate>
                         {{ __('Jobs') }}
                     </x-nav-link>
                 </div>
+                @endcan
+
+                @can('manage-formation')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('formations')" :active="request()->routeIs('formations')" wire:navigate>
                         {{ __('Formations') }}
                     </x-nav-link>
                 </div>
+                @endcan
 
+
+                @can('manage-grades')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('grades')" :active="request()->routeIs('grades')" wire:navigate>
                         {{ __('Grades') }}
                     </x-nav-link>
                 </div>
+                @endcan
 
+                @can('manage-users')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
                         {{ __('Users') }}
                     </x-nav-link>
                 </div>
+                @endcan
+
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('conge')" :active="request()->routeIs('conge')" wire:navigate>
-                        {{ __('list de conge') }}
+                        {{ __('leave historique') }}
                     </x-nav-link>
                 </div>
+                @can('manage-leave')
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('listconge')" :active="request()->routeIs('listconge')" wire:navigate>
+                        {{ __('leave requests') }}
+                    </x-nav-link>
+                </div>
+                @endcan
+
 
 
             </div>
@@ -93,8 +118,13 @@ new class extends Component
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
+                            {{ __('edit Profile') }}
                         </x-dropdown-link>
+                        <button  class="w-full text-start">
+                            <x-dropdown-link href="{{ route('career', Auth::id()) }}" wire:navigate class="w-full text-start">
+                                {{ __('see progress') }}
+                            </x-dropdown-link>
+                        </button>
 
                         <!-- Authentication -->
                         <button wire:click="logout" class="w-full text-start">

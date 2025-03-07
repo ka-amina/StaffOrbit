@@ -42,10 +42,7 @@ class CongeForm extends Component
         if ($this->start_date && $this->end_date) {
             $start = Carbon::parse($this->start_date);
             $end = Carbon::parse($this->end_date);
-
-            $this->total_days = $start->diffInDaysFiltered(function (Carbon $date) {
-                return !$date->isWeekend();
-            }, $end) + 1;
+            $this->total_days = $start->diffInWeekdays($end) + 1;
         }
     }
 
@@ -55,7 +52,7 @@ class CongeForm extends Component
         
         $user = Auth::user();
         
-        if ($this->type === 'Congé annuel' && $user->solde_conge < $this->total_days) {
+        if ($this->type === 'Congé annuel' && $user->solde_conge - $user->leave_days < $this->total_days) {
             session()->flash('error', 'Solde de congé insuffisant. Vous avez ' . $user->solde_conge . ' jours disponibles.');
             return;
         }

@@ -24,6 +24,14 @@ class Formations extends Component
 
     protected $listeners = ['refreshComponent' => '$refresh'];
 
+
+    public function mount()
+    {
+        if (!Auth::user()->can('manage-formation')) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     protected function rules()
     {
         return [

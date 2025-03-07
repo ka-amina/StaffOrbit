@@ -12,8 +12,8 @@
             {{ session('error') }}
         </div>
     @endif
-    
-    <form wire:submit.prevent="submit">
+    <div class="flex justify-center">
+    <form class="w-96 " wire:submit.prevent="submit">
         <div class="mb-4">
             <label class="block text-gray-700 font-medium mb-2">Type de congé</label>
             <select wire:model="type" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -59,4 +59,5 @@
             </button>
         </div>
     </form>
+    </div>
 </div>

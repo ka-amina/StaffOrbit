@@ -10,7 +10,7 @@ use App\Models\CareerRecord;
 use App\Models\Grade;
 use App\Models\Formation;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class Career extends Component
 {
@@ -53,7 +53,7 @@ class Career extends Component
         $this->departmentName = Department::find($this->user->departement_id)->name ?? 'Not Assigned';
         $this->contractTypeName = ContractType::find($this->user->contract_type)->name ?? 'Not Assigned';
         $this->manager = User::find($this->user->manager_id ?? 0)?->name ?? 'Not Assigned';
-      
+
         $this->careerRecords = $this->user->careerRecords()->orderBy('created_at', 'asc')->get();
         $this->contracts = $this->user->contracts()->orderBy('start_date', 'asc')->get();
 
@@ -73,7 +73,7 @@ class Career extends Component
     public function openEditModal()
     {
         $this->isEditModalOpen = true;
-        
+
         if ($this->lastCareerRecord) {
             $this->editCareerRecord = [
                 'type' => $this->lastCareerRecord->type ?? '',
@@ -119,9 +119,43 @@ class Career extends Component
             'editCareerRecord.contract_id' => 'nullable|exists:contracts,id',
             'editCareerRecord.grade_id' => 'nullable|exists:grades,id'
         ]);
-    
+
+        $isChanged = false;
+        if ($this->lastCareerRecord) {
+            if (
+                $this->editCareerRecord['type'] != $this->lastCareerRecord->type ||
+                $this->editCareerRecord['notes'] != $this->lastCareerRecord->notes ||
+                $this->editCareerRecord['end_date'] != $this->lastCareerRecord->end_date ||
+                $this->editCareerRecord['status'] != $this->lastCareerRecord->status ||
+                $this->editCareerRecord['salary'] != $this->lastCareerRecord->salary ||
+                $this->editCareerRecord['formation_id'] != $this->lastCareerRecord->formation_id ||
+                $this->editCareerRecord['contract_id'] != $this->lastCareerRecord->contract_id ||
+                $this->editCareerRecord['grade_id'] != $this->lastCareerRecord->grade_id
+            ) {
+                $isChanged = true;
+            }
+        } else {
+            // If there's no previous record, consider any non-empty values as changes
+            if (
+                !empty($this->editCareerRecord['type']) ||
+                !empty($this->editCareerRecord['notes']) ||
+                !empty($this->editCareerRecord['end_date']) ||
+                !empty($this->editCareerRecord['status']) ||
+                !empty($this->editCareerRecord['salary']) ||
+                !empty($this->editCareerRecord['formation_id']) ||
+                !empty($this->editCareerRecord['contract_id']) ||
+                !empty($this->editCareerRecord['grade_id'])
+            ) {
+                $isChanged = true;
+            }
+        }
+        if (!$isChanged) {
+            $this->closeEditModal();
+            return;
+        }
+
         DB::beginTransaction();
-    
+
         try {
             $careerRecord = new CareerRecord();
             $careerRecord->user_id = $this->userId;
@@ -133,28 +167,25 @@ class Career extends Component
             $careerRecord->formation_id = $this->editCareerRecord['formation_id'];
             $careerRecord->contract_id = $this->editCareerRecord['contract_id'];
             $careerRecord->grade_id = $this->editCareerRecord['grade_id'];
-    
-            if ($this->editCareerRecord['salary'] !== null) {
-                $careerRecord->salary = $this->editCareerRecord['salary'];
-                
-                $user = User::findOrFail($this->userId);
-                $user->salary = $this->editCareerRecord['salary'];
-                $user->save();
-            }
 
-            if ($this->editCareerRecord['contract_id'] !== null) {
-                $user = User::findOrFail($this->userId);
-                $user->contract_type = $this->editCareerRecord['contract_id'];
-                $user->save();
-            }
-            
+
+
+            $user = User::findOrFail($this->userId);
+            $user->salary = $this->editCareerRecord['salary'];
+            $user->contract_type = $this->editCareerRecord['contract_id'];
+            $user->grade_id=$this->editCareerRecord['grade_id'];
+            $user->save();
+
+
+
+
             $careerRecord->save();
-    
+
             DB::commit();
-    
+
             $this->userProfile();
             $this->closeEditModal();
-    
+
             session()->flash('message', 'New career record created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();

@@ -31,6 +31,7 @@ class User extends Authenticatable
         'departement_id',
         'salary',
         'status',
+        'grade_id',
     ];
 
     /**

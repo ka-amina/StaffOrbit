@@ -1,5 +1,5 @@
 <div class="bg-white rounded-lg shadow p-6">
-    <h3 class="text-xl font-semibold mb-4">Historique des demandes de congé</h3>
+    <h3 class="text-xl font-semibold mb-4">Historique de toutes les demandes de congé</h3>
 
     @if (session()->has('success'))
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -14,7 +14,6 @@
     @endif
 
     <div class="flex flex-wrap justify-between gap-4 mb-4 items-center">
-
         <div class="w-full md:w-auto">
             <label class="block text-gray-700 text-sm mb-1">Statut</label>
             <select wire:model.live="status" class="w-full md:w-48 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -24,11 +23,15 @@
                 <option value="rejected">Rejeté</option>
             </select>
         </div>
-        <div>
-            <a href="{{ route('demande', Auth::id()) }}"
-                class="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm">
-                Demande
-            </a>
+
+        <div class="w-full md:w-auto">
+            <label class="block text-gray-700 text-sm mb-1">Employé</label>
+            <select wire:model.live="user_id" class="w-full md:w-48 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tous les employés</option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
 
@@ -36,16 +39,22 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jours</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($conges as $conge)
                 <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ $conge->user->name ?? 'Utilisateur inconnu' }}
+                        </div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-gray-900">{{ $conge->type }}</div>
                     </td>
@@ -66,6 +75,43 @@
                             {{ $conge->status == 'approved' ? 'Approuvé' : 
                             ($conge->status == 'rejected' ? 'Rejeté' : 'En attente') }}
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        @if($conge->status == 'pending')
+
+                        @can('manager-accept')
+                        <button
+                            wire:click="approveRequestManager({{ $conge->id }})"
+                            wire:confirm="Êtes-vous sûr de vouloir approuver cette demande de congé en tant que manager ?"
+                            class="p-2 bg-green-600 hover:bg-green-400 text-white rounded-sm">
+                            Accept
+                        </button>
+                        <button
+                            wire:click="cancelRequestManager({{ $conge->id }})"
+                            wire:confirm="Êtes-vous sûr de vouloir rejeter cette demande de congé en tant que manager ?"
+                            class="p-2 bg-red-600 hover:bg-red-400 text-white rounded-sm">
+                            Refuse
+                        </button>
+                        @endcan
+
+                        @can('rh-accept')
+                        <button
+                            wire:click="approveRequestRh({{ $conge->id }})"
+                            wire:confirm="Êtes-vous sûr de vouloir approuver cette demande de congé en tant que RH ?"
+                            class="p-2 bg-green-600 hover:bg-green-400 text-white rounded-sm">
+                            Accept
+                        </button>
+                        <button
+                            wire:click="cancelRequestRh({{ $conge->id }})"
+                            wire:confirm="Êtes-vous sûr de vouloir rejeter cette demande de congé en tant que RH ?"
+                            class="p-2 bg-red-600 hover:bg-red-400 text-white rounded-sm">
+                            Refuse
+                        </button>
+                        @endcan
+
+                        @else
+                        <span class="text-gray-400">-</span>
+                        @endif
                     </td>
                 </tr>
                 @empty

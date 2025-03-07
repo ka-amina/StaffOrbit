@@ -12,13 +12,16 @@ use App\Models\Department;
 use App\Models\ContractType;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Users extends Component
 {
     use WithPagination;
     use WithFileUploads;
 
-    public $name, $email, $password, $avatar, $phone, $birth_date, $address, $recruitment_date, $contract_type, $departement_id, $salary, $status ,$grade_id;
+    public $name, $email, $password, $avatar, $phone, $birth_date, $address, $recruitment_date, $contract_type, $departement_id, $salary, $status, $grade_id;
     public $temp_avatar;
     public $user_id;
     public $isOpen = false;
@@ -28,7 +31,9 @@ class Users extends Component
     public $contractTypes;
     public $grades;
     public $user;
-    
+    public $role_id;
+public $roles;
+
 
     protected function rules()
     {
@@ -46,17 +51,22 @@ class Users extends Component
             'salary' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive,terminated',
             'grade_id' => 'required|exists:grades,id',
+            'role_id' => 'required|exists:roles,name',
         ];
     }
 
     public function mount()
     {
+
+        if (!Auth::user()->can('manage-users')) {
+            abort(403, 'Unauthorized action.');
+        }
         $this->departments = Department::all();
         $this->contractTypes = ContractType::all();
         $this->grades = Grade::all();
         $this->user = User::all();
         $this->calculateLeaveBalance();
-
+        $this->roles = Role::all();
     }
 
     public function calculateLeaveBalance()
@@ -68,11 +78,10 @@ class Users extends Component
 
             if ($monthsWorked >= 12) {
                 $yearsWorked = $recruitmentDate->diffInYears($now);
-                $leaveBalance = 18 + ($yearsWorked * 0.5);
+                $leaveBalance = 18 + ($yearsWorked - 1) * 0.5;
             } else {
                 $leaveBalance = $monthsWorked * 1.5;
             }
-
             $u->solde_conge = $leaveBalance;
             $u->save();
         }
@@ -88,8 +97,8 @@ class Users extends Component
                 ->select('users.*', 'departments.name as department_name')
                 ->where('users.name', 'like', $searchTerm)
                 ->orWhere('users.email', 'like', $searchTerm)
-                ->orderBy('users.name')                                           
-                ->paginate(10),
+                ->orderBy('users.name')
+                ->paginate(8),
             'count' => User::count(),
             'departments' => $this->departments,
             'contractTypes' => $this->contractTypes,
@@ -174,6 +183,12 @@ class Users extends Component
                 'status' => 'active',
             ]);
         }
+        if ($this->user_id) {
+            $user->syncRoles($this->role_id);
+        } else {
+            $user->assignRole($this->role_id);
+        }
+        
 
         session()->flash('message', 'User saved successfully!');
         $this->closeModal();
@@ -197,6 +212,7 @@ class Users extends Component
         $this->salary = $user->salary;
         $this->grade_id = $user->grade_id;
         $this->status = $user->status;
+        $this->role_id = $user->roles->first()->id ?? null;
         $this->openModal();
     }
 

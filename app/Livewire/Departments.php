@@ -34,8 +34,7 @@ class Departments extends Component
 
     public function mount()
     {
-        // Check if user has permission to view departments
-        if (!Auth::user()->can('view departments')) {
+        if (!Auth::user()->can('manage departments')) {
             abort(403, 'Unauthorized action.');
         }
     }
