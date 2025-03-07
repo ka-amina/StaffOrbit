@@ -6,6 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Post;
 use App\Models\Department;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class Posts extends Component
 {
@@ -25,6 +28,9 @@ class Posts extends Component
 
     public function mount()
     {
+        if (!Auth::user()->can('manage-jobs')) {
+            abort(403, 'Unauthorized action.');
+        }
         $this->departmentOptions = Department::all();
     }
 

@@ -42,10 +42,7 @@ class CongeForm extends Component
         if ($this->start_date && $this->end_date) {
             $start = Carbon::parse($this->start_date);
             $end = Carbon::parse($this->end_date);
-
-            $this->total_days = $start->diffInDaysFiltered(function (Carbon $date) {
-                return !$date->isWeekend();
-            }, $end) + 1;
+            $this->total_days = $start->diffInWeekdays($end) + 1;
         }
     }
 

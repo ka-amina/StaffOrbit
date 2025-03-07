@@ -20,6 +20,13 @@ class Grades extends Component
 
     protected $listeners = ['refreshComponent' => '$refresh'];
 
+
+    public function mount()
+    {
+        if (!Auth::user()->can('manage-grades')) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
     protected function rules()
     {
         return [

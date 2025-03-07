@@ -8,6 +8,8 @@ use App\Models\Contract;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\ContractType;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Contracts extends Component
 {
@@ -32,6 +34,9 @@ class Contracts extends Component
 
     public function mount()
 {
+    if (!Auth::user()->can('manage-contracts')) {
+        abort(403, 'Unauthorized action.');
+    }
     $this->contractTypes = ContractType::all();
 }
 

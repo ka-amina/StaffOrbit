@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\conges;
+use App\Models\Conge;
 use App\Http\Requests\StorecongesRequest;
 use App\Http\Requests\UpdatecongesRequest;
 

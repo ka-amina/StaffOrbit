@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\conges;
+use App\Models\Conge
 use Illuminate\Auth\Access\Response;
 
 class CongesPolicy

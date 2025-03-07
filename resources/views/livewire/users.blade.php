@@ -137,6 +137,17 @@
                             @error('status') <span class="text-red-500">{{ $message }}</span> @enderror
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Role:</label>
+                            <select wire:model="role_id" class="shadow border rounded w-full py-2 px-3">
+                                <option value="">Select Role</option>
+                                @foreach($roles as $role)
+                                <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('role_id') <span class="text-red-500">{{ $message }}</span> @enderror
+                        </div>
+
                         <div class="flex justify-end pt-2">
                             <button wire:click="store"
                                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
@@ -239,10 +250,7 @@
                 </div>
                 @endforeach
             </div>
-            <a href="{{ route('demande', Auth::id()) }}" 
-        class="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm">
-        Demande
-    </a>
+            
             <div class="mt-4">
                 {{ $users->links() }}
             </div>

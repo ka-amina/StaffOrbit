@@ -15,17 +15,62 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin= Role::create(['name' => 'Admin']);
-        $employee = Role::create(['name' => 'Employee']);
-        $rh = Role::create(['name' => 'Rh']);
-        $manager = Role::create(['name' => 'Manager']);
+        // $admin= Role::create(['name' => 'Admin']);
+        // $employee = Role::create(['name' => 'Employee']);
+        // $rh = Role::create(['name' => 'Rh']);
+        // $manager = Role::create(['name' => 'Manager']);
+
+        // $admin->givePermissionTo(Permission::all());
+
+        // $employee ->givePermissionTo([
+        //     'update-profile',
+        //     'view departments'
+        // ]);
+
+        $admin = Role::findByName('Admin');
+        $employee = Role::findByName('Employee');
+        $rh = Role::findByName('Rh');
+        $manager = Role::findByName('Manager');
 
         $admin->givePermissionTo(Permission::all());
 
-        $employee ->givePermissionTo([
+        $employee->givePermissionTo([
+            'track-career-progression',
             'update-profile',
-            'view departments'
+
+
         ]);
-        
+
+        $rh->givePermissionTo([
+            'manage-users',
+            'add-employee',
+            'edit-employee',
+            'delete-employee',
+            'update-career-info',
+            'manage-departments',
+            'assign-departments',
+            'view departments',
+            'track-career-progression',
+            'manage-leave',
+
+            'manage-contracts',
+            'manage-formation',
+            'rh-accept'
+        ]);
+
+        $manager->givePermissionTo([
+            'manage-users',
+            'add-employee',
+            'edit-employee',
+            'delete-employee',
+            'view departments',
+            'update-career-info',
+            'track-career-progression',
+            'manage-leave',
+            'manage-contracts',
+            'manage-formation',
+            'manager-accept',
+
+        ]);
     }
 }

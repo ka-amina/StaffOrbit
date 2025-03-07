@@ -1,7 +1,8 @@
 <div class="py-4">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-            <!-- User Profile Header -->
+           
+            @can('manage-users')
             <div class="flex justify-between items-start mb-6">
                 <a href="{{ route('users') }}" class="text-blue-500 hover:underline">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,10 +12,11 @@
                 </a>
 
             </div>
+            @endcan
 
-            <!-- User Info Card -->
+           
             <div class="flex flex-col items-center">
-                <!-- Profile image - centered -->
+             
                 <div class="mb-6 flex flex-col items-center">
                     @if($user->avatar)
                     <img src="{{ Storage::url($user->avatar) }}" class="w-32 h-32 rounded-full object-cover border-4 border-blue-100" alt="{{ $user->name }}">
@@ -32,45 +34,18 @@
                     </p>
                 </div>
 
-                <!-- Progress Container -->
+               
                 <div class="relative flex items-center justify-between w-3/4 mx-auto">
-                    <!-- Blue Progress Line -->
+                   
                     <div class="absolute top-3 left-0 right-0 mx-auto w-[90%] h-1 bg-blue-500 z-0"></div>
 
-                    @if ($careerRecords->isEmpty())
-                    <!-- Default Steps -->
-                    <div class="relative flex w-full justify-between">
-                        <div class="relative text-center">
-                            <div class="h-6 w-6 rounded-full bg-blue-500 border-2 border-white shadow z-10"></div>
-                            <div class="mt-2 text-sm font-medium">Onboarding</div>
-                            <div class="text-xs text-gray-500">{{ date('M Y', strtotime($user->recruitment_date)) }}</div>
-                        </div>
-
-                        <div class="relative text-center">
-                            <div class="h-6 w-6 rounded-full bg-blue-500 border-2 border-white shadow z-10"></div>
-                            <div class="mt-2 text-sm font-medium">Contract</div>
-                            <div class="text-xs text-gray-500">{{ $contractTypeName }}</div>
-                        </div>
-
-                        <div class="relative text-center">
-                            <div class="h-6 w-6 rounded-full bg-blue-500 border-4 border-white shadow z-10"></div>
-                            <div class="mt-2 text-sm font-medium">Current Position</div>
-                            <div class="text-xs text-gray-500">{{ $departmentName }}</div>
-                        </div>
-
-                        <div class="relative text-center">
-                            <div class="h-6 w-6 rounded-full bg-gray-300 border-2 border-white shadow z-10"></div>
-                            <div class="mt-2 text-sm font-medium text-gray-400">Next Step</div>
-                            <div class="text-xs text-gray-400">Promotion</div>
-                        </div>
-                    </div>
-                    @else
-                    <!-- Dynamic Steps -->
+                 
                     <div class="relative flex w-full justify-between">
                         @foreach ($careerRecords as $index => $record)
                         <div class="relative flex flex-col items-center">
                             <div class="h-6 w-6 rounded-full bg-blue-500 border-2 border-white shadow z-10"></div>
                             <div class="mt-2 text-sm font-medium">{{ ucfirst($record->type) }}</div>
+                            <div class="text-sm font-medium">{{ $contractTypeName}}</div>
                             <div class="text-xs text-gray-500">{{ $record->end_date }}</div>
                         </div>
                         @endforeach
@@ -83,12 +58,11 @@
                             <div class="text-xs text-gray-400">Promotion</div>
                         </div>
                     </div>
-                    @endif
                 </div>
 
             </div>
 
-            <!-- Contract Details Card -->
+           
             <div class="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
                 <div class="flex items-center mb-4">
                     <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center mr-3">
@@ -174,12 +148,13 @@
                         </div>
                         <div>
                             <div class="text-sm text-gray-500">Grade</div>
-                            <div class="font-medium">{{ $userGrade ?? '' }}</div>
+                            <div class="font-medium">{{ $user->grade ? $user->grade->name : 'N/A' }}</div>
                         </div>
                     </div>
 
 
                 </div>
+                @can('manage-users')
                 <div class="flex space-x-1 justify-end">
                     <div class="">
                         <button
@@ -189,6 +164,7 @@
                         </button>
                     </div>
                 </div>
+                @endcan
             </div>
 
             @if($isEditModalOpen)
@@ -197,7 +173,7 @@
                 x-show="open"
                 class="fixed inset-0 z-50 overflow-y-auto">
                 <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <!-- Overlay -->
+                    
                     <div
                         x-show="open"
                         class="fixed inset-0 transition-opacity"
@@ -205,7 +181,7 @@
                         <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                     </div>
 
-                    <!-- Modal Content -->
+                   
                     <div
                         x-show="open"
                         class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
@@ -215,7 +191,7 @@
                                     Edit Career Record
                                 </h3>
 
-                                <!-- Type Field -->
+             
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         Record Type
@@ -234,7 +210,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- Status Field -->
+                               
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         Status
@@ -252,7 +228,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- Salary Field -->
+                               
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         Salary
@@ -267,7 +243,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- End Date Field -->
+                              
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         End Date
@@ -281,7 +257,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- Notes Field -->
+                               
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         Notes
@@ -295,7 +271,6 @@
                                     @enderror
                                 </div>
 
-                                <!-- Dropdowns for Formation, Contract, Grade -->
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">
                                         Formation
