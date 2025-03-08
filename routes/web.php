@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Departments;
 use App\Livewire\Contracts;
 use App\Livewire\Posts;
+use App\Livewire\Dashboard;
 use App\Livewire\Formations;
 use App\Livewire\Grades;
 use App\Livewire\Users;
@@ -16,7 +17,7 @@ use App\Livewire\AllCongeList;
 
 Route::view('/', 'welcome');
 
-Route::view('dashboard', 'dashboard')
+Route::get('/dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 

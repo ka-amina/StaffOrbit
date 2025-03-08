@@ -15,10 +15,10 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // $admin= Role::create(['name' => 'Admin']);
-        // $employee = Role::create(['name' => 'Employee']);
-        // $rh = Role::create(['name' => 'Rh']);
-        // $manager = Role::create(['name' => 'Manager']);
+        $admin= Role::create(['name' => 'Admin']);
+        $employee = Role::create(['name' => 'Employee']);
+        $rh = Role::create(['name' => 'Rh']);
+        $manager = Role::create(['name' => 'Manager']);
 
         // $admin->givePermissionTo(Permission::all());
 
@@ -27,10 +27,10 @@ class RoleSeeder extends Seeder
         //     'view departments'
         // ]);
 
-        $admin = Role::findByName('Admin');
-        $employee = Role::findByName('Employee');
-        $rh = Role::findByName('Rh');
-        $manager = Role::findByName('Manager');
+        // $admin = Role::findByName('Admin');
+        // $employee = Role::findByName('Employee');
+        // $rh = Role::findByName('Rh');
+        // $manager = Role::findByName('Manager');
 
         $admin->givePermissionTo(Permission::all());
 
@@ -55,7 +55,8 @@ class RoleSeeder extends Seeder
 
             'manage-contracts',
             'manage-formation',
-            'rh-accept'
+            'rh-accept',
+            'add-manager'
         ]);
 
         $manager->givePermissionTo([
