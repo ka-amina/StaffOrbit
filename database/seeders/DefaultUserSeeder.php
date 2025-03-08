@@ -16,9 +16,9 @@ class DefaultUserSeeder extends Seeder
     {
 
         $admin = User::create([
-            'name' => 'amina kara',
-            'email' => 'aminakara400@gmail.com',
-            'password' => Hash::make('12345678'),
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('admin@gmail.com'),
             'avatar' => null,
             'phone' => null,
             'birth_date' => now(),
@@ -33,9 +33,9 @@ class DefaultUserSeeder extends Seeder
 
         // Create HR user
         $rh = User::create([
-            'name' => 'Amina Employee',
-            'email' => 'amina@employee.com',
-            'password' => Hash::make('12345678'),
+            'name' => 'rh employee',
+            'email' => 'rh@gmail.com',
+            'password' => Hash::make('rh@gmail.com'),
             'avatar' => null,
             'phone' => null,
             'birth_date' => now(),

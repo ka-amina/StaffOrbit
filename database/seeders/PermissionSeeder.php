@@ -13,11 +13,7 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // $permissions = [
-
-        //     'manager-accept',
-        //     'rh-accept'
-        // ];
+       
         $permissions = [
 
             'create-user',
@@ -50,7 +46,8 @@ class PermissionSeeder extends Seeder
             'manage-formation',
 
             'manager-accept',
-            'rh-accept'
+            'rh-accept',
+            'add-manager'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
